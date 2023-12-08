@@ -29,6 +29,8 @@ class LogisticRegression(nn.Module):
         super().__init__()
         # In a pytorch module, the declarations of layers needs to come after
         # the super __init__ line, otherwise the magic doesn't work.
+        
+        self.log_reg = nn.Linear(n_features, n_classes)
 
     def forward(self, x, **kwargs):
         """
@@ -44,7 +46,9 @@ class LogisticRegression(nn.Module):
         forward pass -- this is enough for it to figure out how to do the
         backward pass.
         """
-        raise NotImplementedError
+        
+        return self.log_reg(x)
+        # raise NotImplementedError
 
 
 # Q2.2
@@ -65,8 +69,35 @@ class FeedforwardNetwork(nn.Module):
         includes modules for several activation functions and dropout as well.
         """
         super().__init__()
+        if activation_type == 'relu':
+            self.activation = nn.ReLU()
+            
+        self.FeedforwardNetwork = nn.Sequential()
+        self.dropout = nn.Dropout(dropout)
+        
+        #list = []
+        #list.append(nn.Linear(n_features, hidden_size))
+        #list.append(self.activation)
+        #list.append(self.dropout)
+        
+        self.FeedforwardNetwork.append(nn.Linear(n_features, hidden_size))
+        self.FeedforwardNetwork.append(self.activation)
+        self.FeedforwardNetwork.append(self.dropout)
+        
+        for i in range(layers-1):
+            #list.append(nn.Linear(hidden_size, hidden_size))
+            #list.append(self.activation)
+            #list.append(self.dropout)
+            self.FeedforwardNetwork.append(nn.Linear(hidden_size, hidden_size))
+            self.FeedforwardNetwork.append(self.activation)
+            self.FeedforwardNetwork.append(self.dropout)
+        
+        #list.append(nn.Linear(hidden_size, n_classes))
+        self.FeedforwardNetwork.append(nn.Linear(hidden_size, n_classes))
+        
+        #self.FeedforwardNetwork = nn.Sequential(*list)
         # Implement me!
-        raise NotImplementedError
+        #raise NotImplementedError
 
     def forward(self, x, **kwargs):
         """
@@ -76,7 +107,10 @@ class FeedforwardNetwork(nn.Module):
         the output logits from x. This will include using various hidden
         layers, pointwise nonlinear functions, and dropout.
         """
-        raise NotImplementedError
+        
+        return self.FeedforwardNetwork(x)
+        
+        #raise NotImplementedError
 
 
 def train_batch(X, y, model, optimizer, criterion, **kwargs):
@@ -97,7 +131,19 @@ def train_batch(X, y, model, optimizer, criterion, **kwargs):
     This function should return the loss (tip: call loss.item()) to get the
     loss as a numerical value that is not part of the computation graph.
     """
-    raise NotImplementedError
+    # clear the gradients
+    optimizer.zero_grad()
+    # compute the model output
+    yhat = model(X)
+    # calculate loss
+    loss = criterion(yhat, y)
+    # credit assignment
+    loss.backward()
+    # update model weights
+    optimizer.step()
+    
+    return loss.item()
+    #raise NotImplementedError
 
 
 def predict(model, X):
@@ -118,6 +164,7 @@ def evaluate(model, X, y, criterion):
     loss = criterion(logits, y)
     loss = loss.item()
     y_hat = logits.argmax(dim=-1)
+    
     n_correct = (y == y_hat).sum().item()
     n_possible = float(y.shape[0])
     model.train()
@@ -147,13 +194,13 @@ def main():
     parser.add_argument('-epochs', default=20, type=int,
                         help="""Number of epochs to train for. You should not
                         need to change this value for your plots.""")
-    parser.add_argument('-batch_size', default=1, type=int,
+    parser.add_argument('-batch_size', default=16, type=int,
                         help="Size of training batch.")
-    parser.add_argument('-learning_rate', type=float, default=0.01)
+    parser.add_argument('-learning_rate', type=float, default=0.1) # {0.001, 0.01, 0.1}.
     parser.add_argument('-l2_decay', type=float, default=0)
-    parser.add_argument('-hidden_size', type=int, default=100)
-    parser.add_argument('-layers', type=int, default=1)
-    parser.add_argument('-dropout', type=float, default=0.3)
+    parser.add_argument('-hidden_size', type=int, default=200)
+    parser.add_argument('-layers', type=int, default=2)
+    parser.add_argument('-dropout', type=float, default=0.0)
     parser.add_argument('-activation',
                         choices=['tanh', 'relu'], default='relu')
     parser.add_argument('-optimizer',

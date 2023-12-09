@@ -102,7 +102,8 @@ class MLP(object):
         return np.where(x > 0, 1, 0)
     
     def softmax(self, x):
-        probs = np.exp(x) / np.sum(np.exp(x))
+        exp_x = x - np.max(x)
+        probs = np.exp(exp_x) / np.sum(np.exp(exp_x))
         return probs
 
     def cross_entropy_derivative(self, out, target):
@@ -119,17 +120,20 @@ class MLP(object):
         for i in range(num_layers):
                 h = x if i == 0 else hiddens[i-1]
                 z = self.W[i].dot(h) + self.b[i]
-                if i < num_layers-1:  # ReLU activation function.
+                if i < num_layers - 1:  # ReLU activation function.
                     hiddens.append(self.relu(z))
-        #compute output
-        output = z
-        return output, hiddens
+                else: # softmax activation function.
+                    hiddens.append(self.softmax(z))
+                    
+        return hiddens[-1], hiddens
     
     def compute_loss(self, output, y):
         # compute loss
-        error = output - y
-        loss = np.sum(error**2)
-        
+        #error = output - y
+        #loss = np.sum(error**2)
+        probs = self.softmax(output)
+        loss = -np.sum(y * np.log(probs))
+    
         return loss
     
     def backward(self, x, y, output, hiddens):

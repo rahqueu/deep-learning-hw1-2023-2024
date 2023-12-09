@@ -1,0 +1,92 @@
+Q1.1a
+report its performance on the training, validation and test sets
+
+training: 0.4654
+validation: 0.4610
+test sets: 0.3422
+
+
+
+Q1.1b
+compare (based on the plots of the train and validation accuracies) the models
+obtained using two different learning rates of η = 0.01 and η = 0.001
+
+learning rate = 0.01
+final test accuracy: 0.5784
+
+learning rate = 0.001
+final test accuracy: 0.5936
+
+
+
+Q1.2a
+A logistic regression model using pixel values
+as features is not as expressive as a multi-layer perceptron using relu activations.
+However, training a logistic regression model is easier because it is a convex optimization
+problem.
+
+
+
+
+
+
+Q1.2b
+final test accuracy: 0.7524
+loss: 947991.7287 | train acc: 0.7975 | val acc: 0.7865
+
+
+Q2.1
+learning rate = 0.01
+final accuracy on the test set: 
+
+learning rate = 0.001
+final accuracy on the test set: 
+
+learning rate = 0.0001
+final accuracy on the test set: 
+
+
+
+Q2.2a
+report the best test accuracy and
+comment on the differences in both
+performance and time of execution
+
+batch size = 16
+test accuracy: 
+
+
+batch size = 1024
+test accuracy: 
+
+
+
+
+Q2.2b
+report the best test accuracy
+and comment on the differences in performance.
+
+learning rate = 1
+test accuracy: 
+
+learning rate = 0.1
+test accuracy: 
+
+learning rate = 0.01
+test accuracy: 
+
+learning rate = 0.001
+test accuracy: 
+
+
+
+Q2.2c
+report the best test accuracy and comment on the differences of
+both techniques
+
+default model w/ batch size=256 && epochs=150:
+is there overfitting?
+
+default model w/ batch size=256 && epochs=150 && L2 reg=0.0001:
+
+default model w/ batch size=256 && epochs=150 && dropout=0.2:

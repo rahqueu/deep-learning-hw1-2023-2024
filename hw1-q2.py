@@ -68,35 +68,24 @@ class FeedforwardNetwork(nn.Module):
         attributes that each FeedforwardNetwork instance has. Note that nn
         includes modules for several activation functions and dropout as well.
         """
-        super().__init__()
-        if activation_type == 'relu':
-            self.activation = nn.ReLU()
-            
+        super().__init__()            
+        self.activation = nn.ReLU()
         self.FeedforwardNetwork = nn.Sequential()
         self.dropout = nn.Dropout(dropout)
         
-        #list = []
-        #list.append(nn.Linear(n_features, hidden_size))
-        #list.append(self.activation)
-        #list.append(self.dropout)
-        
+        # input        
         self.FeedforwardNetwork.append(nn.Linear(n_features, hidden_size))
         self.FeedforwardNetwork.append(self.activation)
         self.FeedforwardNetwork.append(self.dropout)
         
+        # hidden layers
         for i in range(layers-1):
-            #list.append(nn.Linear(hidden_size, hidden_size))
-            #list.append(self.activation)
-            #list.append(self.dropout)
             self.FeedforwardNetwork.append(nn.Linear(hidden_size, hidden_size))
             self.FeedforwardNetwork.append(self.activation)
             self.FeedforwardNetwork.append(self.dropout)
         
-        #list.append(nn.Linear(hidden_size, n_classes))
+        # output layers
         self.FeedforwardNetwork.append(nn.Linear(hidden_size, n_classes))
-        
-        #self.FeedforwardNetwork = nn.Sequential(*list)
-        # Implement me!
         #raise NotImplementedError
 
     def forward(self, x, **kwargs):
@@ -109,7 +98,6 @@ class FeedforwardNetwork(nn.Module):
         """
         
         return self.FeedforwardNetwork(x)
-        
         #raise NotImplementedError
 
 

@@ -49,11 +49,12 @@ class Perceptron(LinearModel):
         
         # calculate predicted y
         y_hat = self.predict(x_i)
+        eta = kwargs.get("learning_rate", 1)
         
         # update weights if prediction is wrong
         if (y_hat != y_i):
-            self.W[y_i,:] += x_i
-            self.W[y_hat,:] -= x_i
+            self.W[y_i,:] += eta * x_i
+            self.W[y_hat,:] -= eta * x_i
         #raise NotImplementedError
 
 
@@ -90,8 +91,8 @@ class MLP(object):
     # in main().
     def __init__(self, n_classes, n_features, hidden_size):
         # Initialize an MLP with a single hidden layer.
-        self.W = [np.random.normal(0.1, 0.1**2, (hidden_size, n_features)), 
-                  np.random.normal(0.1, 0.1**2, (n_classes, hidden_size))]
+        self.W = [np.random.normal(0.1, 0.1, (hidden_size, n_features)), 
+                  np.random.normal(0.1, 0.1, (n_classes, hidden_size))]
         self.b = [np.zeros(hidden_size), np.zeros(n_classes)]
         #raise NotImplementedError
 
@@ -106,11 +107,10 @@ class MLP(object):
         probs = np.exp(exp_x) / np.sum(np.exp(exp_x))
         return probs
 
-    def cross_entropy_derivative(self, out, target):
-        # return self.softmax(out) - target
-        t = np.zeros(out.shape)
-        t[target] = 1
-        return out - t
+    def cross_entropy_derivative(self, out, y):
+        y_one_hot = np.zeros(out.shape)
+        y_one_hot[y] = 1
+        return out - y_one_hot
 
     def forward(self, x):
         hiddens = []
@@ -129,8 +129,6 @@ class MLP(object):
     
     def compute_loss(self, output, y):
         # compute loss
-        #error = output - y
-        #loss = np.sum(error**2)
         probs = self.softmax(output)
         loss = -np.sum(y * np.log(probs))
     

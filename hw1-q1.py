@@ -103,14 +103,9 @@ class MLP(object):
         return np.where(x > 0, 1, 0)
     
     def softmax(self, x):
-        exp_x = x - np.max(x)
-        probs = np.exp(exp_x) / np.sum(np.exp(exp_x))
+        x = x - np.max(x)
+        probs = np.exp(x) / np.sum(np.exp(x))
         return probs
-
-    def cross_entropy_derivative(self, out, y):
-        y_one_hot = np.zeros(out.shape)
-        y_one_hot[y] = 1
-        return out - y_one_hot
 
     def forward(self, x):
         hiddens = []
@@ -122,23 +117,30 @@ class MLP(object):
                 z = self.W[i].dot(h) + self.b[i]
                 if i < num_layers - 1:  # ReLU activation function.
                     hiddens.append(self.relu(z))
-                else: # softmax activation function.
-                    hiddens.append(self.softmax(z))
-                    
-        return hiddens[-1], hiddens
+                  
+        return z, hiddens
     
     def compute_loss(self, output, y):
         # compute loss
-        probs = self.softmax(output)
-        loss = -np.sum(y * np.log(probs))
-    
+        neg_log_likelihood = np.dot(-y.T, output)
+        log_sum_exp = np.log(np.sum(np.exp(output - np.max(output)*0.5))) + np.log(np.exp(np.max(output)*0.5))
+        
+        loss = neg_log_likelihood + log_sum_exp
         return loss
+    
+    '''
+    def cross_entropy_derivative(self, out, y):
+        y_one_hot = np.zeros(out.shape)
+        y_one_hot[y] = 1
+        return out - y_one_hot
+    '''
     
     def backward(self, x, y, output, hiddens):
         num_layers = len(self.W)
-        #output -= output.max()
         
-        grad_z = self.cross_entropy_derivative(output, y)
+        probs = self.softmax(output)
+        grad_z = probs - y
+        #self.cross_entropy_derivative(output, y)
         
         grad_weights = []
         grad_biases = []
@@ -173,6 +175,7 @@ class MLP(object):
             y_hat = np.argmax(output)
             predicted_labels.append(y_hat)
         predicted_labels = np.array(predicted_labels)
+
         return predicted_labels
         #raise NotImplementedError
 
@@ -197,11 +200,14 @@ class MLP(object):
         for x_i, y_i in zip(X, y):
             output, hiddens = self.forward(x_i)
 
+            y_one_hot = np.zeros(output.shape)
+            y_one_hot[y_i] = 1
+            
             # Compute Loss and Update total loss
-            loss = self.compute_loss(output, y_i)
+            loss = self.compute_loss(output, y_one_hot)
             total_loss+=loss
             
-            grad_weights, grad_biases = self.backward(x_i, y_i, output, hiddens)
+            grad_weights, grad_biases = self.backward(x_i, y_one_hot, output, hiddens)
             
             for i in range(num_layers):
                 self.W[i] -= learning_rate*grad_weights[i]

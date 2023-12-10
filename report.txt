@@ -20,10 +20,10 @@ final test accuracy: 0.5936
 
 
 Q1.2a
-A logistic regression model using pixel values
+Comment the following claim: “A logistic regression model using pixel values
 as features is not as expressive as a multi-layer perceptron using relu activations.
 However, training a logistic regression model is easier because it is a convex optimization
-problem.
+problem.” Is this true of false? Justify.
 
 
 

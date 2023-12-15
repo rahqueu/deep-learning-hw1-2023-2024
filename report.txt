@@ -12,9 +12,13 @@ compare (based on the plots of the train and validation accuracies) the models
 obtained using two different learning rates of η = 0.01 and η = 0.001
 
 learning rate = 0.01
+training set accuracy: 0.6609
+validation set accuracy: 0.6568
 final test accuracy: 0.5784
 
 learning rate = 0.001
+training set accuracy: 0.6625
+validation set accuracy: 0.6639
 final test accuracy: 0.5936
 
 
